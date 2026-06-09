@@ -406,7 +406,7 @@ const COLS=[
   {key:'tx_coord',  label:'Tx Coord',   type:'text',    thClass:'th-warm',  filterable:true, sortable:true},
   {key:'_dias',     label:'Días',       type:'dias',    thClass:'',    filterable:false, sortable:true},
   {key:'estado',    label:'Estado',     type:'select',  thClass:'',    filterable:true,  sortable:true, opts:ESTADOS},
-  {key:'_intake',   label:'Intake',     type:'intake',  thClass:'',    filterable:false, sortable:false},
+  {key:'_intake',   label:'Coord. Checklist', type:'intake', thClass:'', filterable:false, sortable:false},
   {key:'last_edited_by',label:'Editado por',type:'readonly',thClass:'th-warm', filterable:true, sortable:false},
   {key:'_actions',  label:'',           type:'actions', width:'70px',  filterable:false, sortable:false},
 ];
@@ -621,7 +621,10 @@ function renderTable(){
     const days=daysSince(p.crm);
     const dCls=days===null?'days-ok':days>30?'days-alert':days>14?'days-warn':'days-ok';
     const ic=intakeCount(p.intake);
-    const pips=INTAKE_ITEMS.map((_,i)=>{const v=p.intake?p.intake[INTAKE_ITEMS[i]]:'';return`<span class="pip${v==='done'?' done':v==='partial'?' partial':''}"></span>`;}).join('');
+    const doneTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='done');
+    const pendTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='pending');
+    const tagsHtml=doneTags.map(item=>`<span style="display:inline-block;background:var(--green-lt);color:var(--green);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">${item}</span>`).join('')+pendTags.map(item=>`<span style="display:inline-block;background:var(--amber-lt);color:var(--amber);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">${item}</span>`).join('');
+    const emptyState=ic===0?`<span style="font-size:11px;color:var(--t3);">Sin items — click para agregar</span>`:'';
     const editInfo=p.last_edited_by?`<div class="edited-by">${shortEmail(p.last_edited_by)}<br><span style="font-size:9px;">${timeAgo(p.last_edited_at)}</span></div>`:'<div class="edited-by">—</div>';
 
     return`<tr data-id="${p.id}">
@@ -641,7 +644,7 @@ function renderTable(){
       <td><div class="cell muted" data-id="${p.id}" data-field="tx_coord" data-type="text">${p.tx_coord||'—'}</div></td>
       <td style="padding:0 10px;"><span class="${dCls}">${days!==null?days+'d':'—'}</span></td>
       <td><div class="cell" data-id="${p.id}" data-field="estado" data-type="select" data-opts="${ESTADOS.join('|')}"><span class="badge ${BCLS[estado]||'b-nuevo'}">${estado}</span></div></td>
-      <td style="padding:0 6px;"><div class="pips pips-clickable" style="cursor:pointer;padding:6px 6px;border-radius:5px;border:1px solid transparent;transition:all .1s;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${pips}<span class="pip-count">${ic}/${INTAKE_ITEMS.length}</span></div></td>
+      <td style="padding:4px 8px;max-width:220px;"><div class="pips-clickable" style="cursor:pointer;padding:4px 5px;border-radius:6px;border:1px solid transparent;transition:all .1s;min-height:32px;display:flex;flex-wrap:wrap;align-items:center;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${tagsHtml}${emptyState}${ic>0?`<span style="font-size:10px;color:var(--t3);margin-left:3px;">${ic}/${INTAKE_ITEMS.length}</span>`:''}</div></td>
       <td style="padding:0 10px;">${editInfo}</td>
       <td style="padding:0 8px;white-space:nowrap;">
         <button onclick="openModal('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:15px;padding:3px 4px;" title="Editar intake/notas">✎</button>
