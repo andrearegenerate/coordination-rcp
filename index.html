@@ -409,7 +409,7 @@ const COLS=[
   {key:'tx_coord',  label:'Tx Coord',   type:'text',    thClass:'th-warm',  filterable:true, sortable:true},
   {key:'_dias',     label:'Días',       type:'dias',    thClass:'',    filterable:false, sortable:true},
   {key:'estado',    label:'Estado',     type:'select',  thClass:'',    filterable:true,  sortable:true, opts:ESTADOS},
-  {key:'_intake',   label:'Intake',     type:'intake',  thClass:'',    filterable:false, sortable:false},
+  {key:'_intake',   label:'Coord. Checklist', type:'intake', thClass:'', filterable:false, sortable:false},
   {key:'last_edited_by',label:'Editado por',type:'readonly',thClass:'th-warm', filterable:true, sortable:false},
   {key:'_actions',  label:'',           type:'actions', width:'70px',  filterable:false, sortable:false},
 ];
@@ -627,7 +627,7 @@ function renderTable(){
     const doneTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='done');
     const pendTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='pending');
     const tagsHtml=doneTags.map(item=>'<span style="display:inline-block;background:#D8F0E4;color:#2D6A4F;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">'+item+'</span>').join('')+pendTags.map(item=>'<span style="display:inline-block;background:#FAF0DC;color:#7A5500;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">'+item+'</span>').join('');
-    const emptyHtml=ic===0?'<span style="font-size:11px;color:#9A8A82;">Sin items</span>':'';
+    const emptyHtml=(doneTags.length===0&&pendTags.length===0)?'<span style="font-size:11px;color:#9A8A82;font-style:italic;">Sin items</span>':'';
     const editInfo=p.last_edited_by?`<div class="edited-by">${shortEmail(p.last_edited_by)}<br><span style="font-size:9px;">${timeAgo(p.last_edited_at)}</span></div>`:'<div class="edited-by">—</div>';
 
     return`<tr data-id="${p.id}">
