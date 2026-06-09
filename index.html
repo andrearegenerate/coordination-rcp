@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RCP · Coordinación</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -17,7 +16,7 @@
   --green:#2D6A4F;--green-lt:#D8F0E4;--red:#8B2020;--red-lt:#F5DADA;
   --amber-lt:#FAF0DC;--amber:#7A5500;--purple-lt:#EAE3F5;--purple:#3D2D7A;
   --r:8px;--rlg:12px;
-  --serif:'EB Garamond',Georgia,serif;--sans:'Inter',system-ui,sans-serif;
+  --serif:system-ui,sans-serif;--sans:system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
@@ -26,7 +25,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .login-wrap{display:flex;align-items:center;justify-content:center;height:100vh;}
 .login-card{background:var(--surface);border:1px solid var(--bdr-md);border-radius:var(--rlg);width:360px;overflow:hidden;}
 .login-hdr{background:var(--esp);padding:28px;text-align:center;}
-.login-logo{font-family:var(--serif);font-size:21px;color:var(--cream);letter-spacing:.04em;}
+.login-logo{font-size:21px;font-weight:500;color:var(--cream);letter-spacing:.04em;}
 .login-sub{font-size:12px;color:var(--gold);margin-top:4px;}
 .login-body{padding:24px 28px;}
 .lf{margin-bottom:16px;}
@@ -40,7 +39,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 /* SHELL */
 .app{display:none;flex-direction:column;height:100vh;}
 .topbar{background:var(--esp);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
-.topbar-brand{font-family:var(--serif);font-size:16px;color:var(--cream);letter-spacing:.04em;display:flex;align-items:baseline;gap:10px;}
+.topbar-brand{font-size:15px;font-weight:500;color:var(--cream);letter-spacing:.04em;display:flex;align-items:baseline;gap:10px;}
 .topbar-brand span{font-size:11px;color:var(--gold);font-family:var(--sans);}
 .topbar-r{display:flex;align-items:center;gap:10px;}
 .user-pill{background:rgba(181,106,74,.25);color:var(--cream);padding:4px 12px;border-radius:20px;font-size:12px;}
@@ -94,7 +93,7 @@ tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s;}
 tbody tr:nth-child(even){background:var(--cream);}
 tbody tr:hover{background:var(--gold-pale);}
 td{font-size:12px;color:var(--text);padding:0;}
-.td-name{font-weight:500;font-family:var(--serif);font-size:13px;}
+.td-name{font-weight:500;font-size:13px;}
 
 /* INLINE CELLS */
 .cell{padding:7px 10px;min-height:34px;cursor:pointer;border:1px solid transparent;border-radius:3px;transition:border-color .1s;display:block;}
@@ -127,7 +126,7 @@ td{font-size:12px;color:var(--text);padding:0;}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
 .kpi-card{background:var(--surface);border:1px solid var(--bdr);border-radius:var(--rlg);padding:16px 18px;}
 .kpi-card-label{font-size:10px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
-.kpi-card-val{font-family:var(--serif);font-size:28px;color:var(--text);line-height:1;}
+.kpi-card-val{font-size:26px;font-weight:500;color:var(--text);line-height:1;}
 .kpi-card-val.t{color:var(--terra);}
 .kpi-card-val.g{color:var(--gold);}
 .kpi-card-val.gr{color:var(--green);}
@@ -168,7 +167,7 @@ td{font-size:12px;color:var(--text);padding:0;}
 .overlay.open{display:flex;}
 .modal{background:var(--surface);border-radius:var(--rlg);width:100%;max-width:760px;border:1px solid var(--bdr);}
 .modal-hdr{background:var(--esp);padding:16px 22px;border-radius:var(--rlg) var(--rlg) 0 0;display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-family:var(--serif);font-size:18px;color:var(--cream);}
+.modal-title{font-size:17px;font-weight:500;color:var(--cream);}
 .modal-sub{font-size:11px;color:var(--gold);margin-top:2px;}
 .modal-x{background:none;border:none;color:var(--cream);cursor:pointer;font-size:18px;opacity:.6;padding:2px 6px;}
 .modal-x:hover{opacity:1;}
