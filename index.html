@@ -379,9 +379,10 @@ const SB_URL='https://yuwhegqnagyptyvyxbwz.supabase.co';
 const SB_KEY='sb_publishable_i1esy7LEtS_Xf-Wwmniktw_nJOo2CGU';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 
-const INTAKE_ITEMS=['Coordination Checklist','Vuelo','Transporte','Hotel','Royal Saloon',
+const INTAKE_ITEMS=['Intake Form','Vuelo','Transporte','Hotel','Royal Saloon',
   'Citas Odoo','Citas HBOT y RLT','Itinerario de tratamiento',
-  'Orden CELLAB','Censo','Final email','Correo y pasaporte en Odoo','Specific Services'];
+  'Orden CELLAB','Censo','Final email','Correo y pasaporte en Odoo','Specific Services',
+  'Firmó invoice','Recibimos pasaporte'];
 
 const ESTADOS=['Nuevo','En proceso','En tratamiento'];
 const RES_LLAMADA=['Contestó','No Answer','Número inválido','Buzón','Pendiente','Esperando respuesta'];
@@ -623,7 +624,10 @@ function renderTable(){
     const days=daysSince(p.crm);
     const dCls=days===null?'days-ok':days>30?'days-alert':days>14?'days-warn':'days-ok';
     const ic=intakeCount(p.intake);
-    const pips=INTAKE_ITEMS.map((_,i)=>{const v=p.intake?p.intake[INTAKE_ITEMS[i]]:'';return`<span class="pip${v==='done'?' done':v==='partial'?' partial':''}"></span>`;}).join('');
+    const doneTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='done');
+    const pendTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='pending');
+    const tagsHtml=doneTags.map(item=>'<span style="display:inline-block;background:#D8F0E4;color:#2D6A4F;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">'+item+'</span>').join('')+pendTags.map(item=>'<span style="display:inline-block;background:#FAF0DC;color:#7A5500;font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">'+item+'</span>').join('');
+    const emptyHtml=ic===0?'<span style="font-size:11px;color:#9A8A82;">Sin items</span>':'';
     const editInfo=p.last_edited_by?`<div class="edited-by">${shortEmail(p.last_edited_by)}<br><span style="font-size:9px;">${timeAgo(p.last_edited_at)}</span></div>`:'<div class="edited-by">—</div>';
 
     return`<tr data-id="${p.id}">
@@ -636,7 +640,7 @@ function renderTable(){
       <td><div class="cell" data-id="${p.id}" data-field="res_llamada" data-type="select" data-opts="${RES_LLAMADA.join('|')}">${p.res_llamada||'<span style="color:var(--t3)">—</span>'}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="correo" data-type="date">${fmt(p.correo)}</div></td>
       <td><div class="cell" data-id="${p.id}" data-field="res_correo" data-type="select" data-opts="${RES_CORREO.join('|')}">${p.res_correo||'<span style="color:var(--t3)">—</span>'}</div></td>
-      <td><div class="cell" data-id="${p.id}" data-field="tratamiento" data-type="select" data-opts="${TRATAMIENTOS.join('|')}">${p.tratamiento||'<span style="color:var(--t3)">—</span>'}</div></td>
+      <td><div class="cell" data-id="${p.id}" data-field="tratamiento" data-type="text">${p.tratamiento||'<span style="color:var(--t3)">—</span>'}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="fecha_llegada" data-type="date">${fmt(p.fecha_llegada)}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="fecha_salida" data-type="date">${fmt(p.fecha_salida)}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="advocate" data-type="text">${p.advocate||'—'}</div></td>
@@ -644,7 +648,7 @@ function renderTable(){
       <td><div class="cell muted" data-id="${p.id}" data-field="tx_coord" data-type="text">${p.tx_coord||'—'}</div></td>
       <td style="padding:0 10px;"><span class="${dCls}">${days!==null?days+'d':'—'}</span></td>
       <td><div class="cell" data-id="${p.id}" data-field="estado" data-type="select" data-opts="${ESTADOS.join('|')}"><span class="badge ${BCLS[estado]||'b-nuevo'}">${estado}</span></div></td>
-      <td style="padding:0 6px;"><div class="pips pips-clickable" style="cursor:pointer;padding:6px 6px;border-radius:5px;border:1px solid transparent;transition:all .1s;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${pips}<span class="pip-count">${ic}/${INTAKE_ITEMS.length}</span></div></td>
+      <td style="padding:0 6px;"><div class="pips pips-clickable" style="cursor:pointer;padding:6px 6px;border-radius:5px;border:1px solid transparent;transition:all .1s;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${tagsHtml}${emptyHtml}${ic>0?'<span style="font-size:10px;color:#9A8A82;margin-left:4px;">'+ic+'/'+INTAKE_ITEMS.length+'</span>':''}</div></td>
       <td style="padding:0 10px;">${editInfo}</td>
       <td style="padding:0 8px;white-space:nowrap;">
         <button onclick="openModal('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:15px;padding:3px 4px;" title="Editar intake/notas">✎</button>
