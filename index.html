@@ -324,20 +324,21 @@ td{font-size:12px;color:var(--text);padding:0;}
       <div class="sdiv"><span>Datos personales</span></div>
       <div class="fg"><label>Nombre completo *</label><input type="text" id="f-nombre" placeholder="Ej: María González"></div>
       <div class="fg"><label>País de origen</label><input type="text" id="f-pais" placeholder="Ej: México"></div>
+      <div class="fg"><label>Tipo de paciente</label>
+        <select id="f-tipo-pac"><option value="">—</option><option value="Local">Local</option><option value="Extranjero">Extranjero</option></select></div>
 
       <div class="sdiv"><span>CRM y seguimiento</span></div>
       <div class="fg"><label>Fecha en CRM *</label><input type="date" id="f-crm"></div>
       <div class="fg"><label>Día del abono</label><input type="date" id="f-abono"></div>
       <div class="fg"><label>1ª Llamada</label><input type="date" id="f-llamada"></div>
       <div class="fg"><label>Resultado llamada</label>
-        <select id="f-res-llamada"><option value="">—</option><option>Contestó</option><option>No Answer</option><option>Número inválido</option><option>Buzón</option><option>Pendiente</option></select></div>
+        <select id="f-res-llamada"><option value="">—</option><option>Contestó</option><option>No Answer</option><option>Número inválido</option><option>Buzón</option><option>Pendiente</option><option>Esperando respuesta</option></select></div>
       <div class="fg"><label>1er Correo</label><input type="date" id="f-correo"></div>
       <div class="fg"><label>Resultado correo</label>
-        <select id="f-res-correo"><option value="">—</option><option>Respondió</option><option>Sin respuesta</option><option>Rebotó</option><option>Pendiente</option></select></div>
+        <select id="f-res-correo"><option value="">—</option><option>Respondió</option><option>Sin respuesta</option><option>Rebotó</option><option>Pendiente</option><option>Esperando respuesta</option></select></div>
 
       <div class="sdiv"><span>Tratamiento y equipo</span></div>
-      <div class="fg"><label>Tipo de tratamiento</label>
-        <select id="f-tto"><option value="">—</option><option>Stem Cell IV</option><option>PRP + Exosomas</option><option>NAD+ Protocol</option><option>Immune Boost</option><option>Anti-Aging Plus</option><option>Cellular Rejuvenation</option><option>Custom Package</option></select></div>
+      <div class="fg"><label>Tipo de tratamiento</label><input type="text" id="f-tto" placeholder="Ej: Stem Cell IV, NAD+ Protocol..."></div>
       <div class="fg"><label>Fecha llegada a Panamá</label><input type="date" id="f-llegada"></div>
       <div class="fg"><label>Fecha salida de Panamá</label><input type="date" id="f-salida"></div>
       <div class="fg"><label>Patient Advocate</label><input type="text" id="f-advocate" placeholder="Nombre"></div>
@@ -348,7 +349,7 @@ td{font-size:12px;color:var(--text);padding:0;}
       <div class="checklist-grid" id="checklist-grid"></div>
 
       <div class="sdiv"><span>Observaciones</span></div>
-      <div class="fg full"><label>Notas</label><textarea id="f-notas" rows="3" placeholder="Comentarios, acuerdos..."></textarea></div>
+      <div class="fg full"><label>Notas / Observaciones</label><textarea id="f-notas" rows="3" placeholder="Comentarios, acuerdos, detalles importantes..."></textarea></div>
     </div>
     <div class="modal-ftr">
       <div class="modal-ftr-info" id="modal-ftr-info"></div>
@@ -383,8 +384,8 @@ const INTAKE_ITEMS=['Coordination Checklist','Vuelo','Transporte','Hotel','Royal
   'Orden CELLAB','Censo','Final email','Correo y pasaporte en Odoo','Specific Services'];
 
 const ESTADOS=['Nuevo','En proceso','En tratamiento'];
-const RES_LLAMADA=['Contestó','No Answer','Número inválido','Buzón','Pendiente'];
-const RES_CORREO=['Respondió','Sin respuesta','Rebotó','Pendiente'];
+const RES_LLAMADA=['Contestó','No Answer','Número inválido','Buzón','Pendiente','Esperando respuesta'];
+const RES_CORREO=['Respondió','Sin respuesta','Rebotó','Pendiente','Esperando respuesta'];
 const TRATAMIENTOS=['Stem Cell IV','PRP + Exosomas','NAD+ Protocol','Immune Boost','Anti-Aging Plus','Cellular Rejuvenation','Custom Package'];
 const BCLS={Nuevo:'b-nuevo','En proceso':'b-proceso','En tratamiento':'b-tratamiento',Archivado:'b-archivado'};
 
@@ -392,6 +393,7 @@ const BCLS={Nuevo:'b-nuevo','En proceso':'b-proceso','En tratamiento':'b-tratami
 const COLS=[
   {key:'_avatar',   label:'',           type:'avatar',  width:'36px',  filterable:false, sortable:false},
   {key:'nombre',    label:'Paciente',   type:'text',    thClass:'',    filterable:true,  sortable:true},
+  {key:'tipo_paciente',label:'Tipo',      type:'select',  thClass:'',    filterable:true,  sortable:true, opts:['Local','Extranjero']},
   {key:'crm',       label:'Fecha CRM',  type:'date',    thClass:'th-terra', filterable:true, sortable:true},
   {key:'abono',     label:'Abono',      type:'date',    thClass:'th-terra', filterable:true, sortable:true},
   {key:'llamada',   label:'1ª Llamada', type:'date',    thClass:'th-terra', filterable:true, sortable:true},
@@ -406,7 +408,7 @@ const COLS=[
   {key:'tx_coord',  label:'Tx Coord',   type:'text',    thClass:'th-warm',  filterable:true, sortable:true},
   {key:'_dias',     label:'Días',       type:'dias',    thClass:'',    filterable:false, sortable:true},
   {key:'estado',    label:'Estado',     type:'select',  thClass:'',    filterable:true,  sortable:true, opts:ESTADOS},
-  {key:'_intake',   label:'Coord. Checklist', type:'intake', thClass:'', filterable:false, sortable:false},
+  {key:'_intake',   label:'Intake',     type:'intake',  thClass:'',    filterable:false, sortable:false},
   {key:'last_edited_by',label:'Editado por',type:'readonly',thClass:'th-warm', filterable:true, sortable:false},
   {key:'_actions',  label:'',           type:'actions', width:'70px',  filterable:false, sortable:false},
 ];
@@ -621,15 +623,13 @@ function renderTable(){
     const days=daysSince(p.crm);
     const dCls=days===null?'days-ok':days>30?'days-alert':days>14?'days-warn':'days-ok';
     const ic=intakeCount(p.intake);
-    const doneTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='done');
-    const pendTags=INTAKE_ITEMS.filter(item=>p.intake&&p.intake[item]==='pending');
-    const tagsHtml=doneTags.map(item=>`<span style="display:inline-block;background:var(--green-lt);color:var(--green);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">${item}</span>`).join('')+pendTags.map(item=>`<span style="display:inline-block;background:var(--amber-lt);color:var(--amber);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;margin:2px 2px 2px 0;white-space:nowrap;">${item}</span>`).join('');
-    const emptyState=ic===0?`<span style="font-size:11px;color:var(--t3);">Sin items — click para agregar</span>`:'';
+    const pips=INTAKE_ITEMS.map((_,i)=>{const v=p.intake?p.intake[INTAKE_ITEMS[i]]:'';return`<span class="pip${v==='done'?' done':v==='partial'?' partial':''}"></span>`;}).join('');
     const editInfo=p.last_edited_by?`<div class="edited-by">${shortEmail(p.last_edited_by)}<br><span style="font-size:9px;">${timeAgo(p.last_edited_at)}</span></div>`:'<div class="edited-by">—</div>';
 
     return`<tr data-id="${p.id}">
       <td style="padding:0 4px 0 10px;"><div class="avatar">${(p.nombre||'?').split(' ').map(w=>w[0]).slice(0,2).join('')}</div></td>
-      <td class="td-name" style="padding:0 10px;">${p.nombre||'—'}<br><span style="font-size:10px;font-weight:400;color:var(--t3);font-family:var(--sans);">${p.pais||''}</span></td>
+      <td class="td-name" style="padding:0 10px;">${p.nombre||'—'}<br><span style="font-size:10px;font-weight:400;color:var(--t3);">${p.pais||''}</span></td>
+      <td><div class="cell" data-id="${p.id}" data-field="tipo_paciente" data-type="select" data-opts="Local|Extranjero">${p.tipo_paciente?`<span style='font-size:11px;padding:2px 8px;border-radius:10px;background:${p.tipo_paciente==='Local'?'#E8F4FD':'#F5EDE0'};color:${p.tipo_paciente==='Local'?'#1A5276':'#7A4A2A'};font-weight:500;'>${p.tipo_paciente}</span>`:'<span style="color:var(--t3)">—</span>'}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="crm" data-type="date">${fmt(p.crm)}</div></td>
       <td><div class="cell${p.abono?'':' muted'}" data-id="${p.id}" data-field="abono" data-type="date">${p.abono?`<span style="color:var(--green)">✓ ${fmt(p.abono)}</span>`:'—'}</div></td>
       <td><div class="cell muted" data-id="${p.id}" data-field="llamada" data-type="date">${fmt(p.llamada)}</div></td>
@@ -644,7 +644,7 @@ function renderTable(){
       <td><div class="cell muted" data-id="${p.id}" data-field="tx_coord" data-type="text">${p.tx_coord||'—'}</div></td>
       <td style="padding:0 10px;"><span class="${dCls}">${days!==null?days+'d':'—'}</span></td>
       <td><div class="cell" data-id="${p.id}" data-field="estado" data-type="select" data-opts="${ESTADOS.join('|')}"><span class="badge ${BCLS[estado]||'b-nuevo'}">${estado}</span></div></td>
-      <td style="padding:4px 8px;max-width:220px;"><div class="pips-clickable" style="cursor:pointer;padding:4px 5px;border-radius:6px;border:1px solid transparent;transition:all .1s;min-height:32px;display:flex;flex-wrap:wrap;align-items:center;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${tagsHtml}${emptyState}${ic>0?`<span style="font-size:10px;color:var(--t3);margin-left:3px;">${ic}/${INTAKE_ITEMS.length}</span>`:''}</div></td>
+      <td style="padding:0 6px;"><div class="pips pips-clickable" style="cursor:pointer;padding:6px 6px;border-radius:5px;border:1px solid transparent;transition:all .1s;" data-id="${p.id}" onmouseenter="this.style.borderColor='var(--bdr-md)';this.style.background='var(--surface)'" onmouseleave="this.style.borderColor='transparent';this.style.background=''" onclick="event.stopPropagation();openChecklistPop('${p.id}',this)">${pips}<span class="pip-count">${ic}/${INTAKE_ITEMS.length}</span></div></td>
       <td style="padding:0 10px;">${editInfo}</td>
       <td style="padding:0 8px;white-space:nowrap;">
         <button onclick="openModal('${p.id}')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:15px;padding:3px 4px;" title="Editar intake/notas">✎</button>
@@ -840,7 +840,7 @@ function openModal(id){
     ['f-llamada','llamada'],['f-res-llamada','res_llamada'],['f-correo','correo'],
     ['f-res-correo','res_correo'],['f-tto','tratamiento'],['f-llegada','fecha_llegada'],
     ['f-salida','fecha_salida'],['f-advocate','advocate'],['f-pre-coord','pre_coord'],
-    ['f-tx-coord','tx_coord'],['f-notas','notas']];
+    ['f-tx-coord','tx_coord'],['f-notas','notas'],['f-tipo-pac','tipo_paciente']];
   map.forEach(([elId,field])=>{const el=document.getElementById(elId);if(el)el.value=p?p[field]||'':'';});
   buildIntakeGrid(p?p.intake:null);
   document.getElementById('modal').classList.add('open');
@@ -864,6 +864,7 @@ async function saveModal(){
     correo:document.getElementById('f-correo').value||null,
     res_correo:document.getElementById('f-res-correo').value||null,
     tratamiento:document.getElementById('f-tto').value||null,
+    tipo_paciente:document.getElementById('f-tipo-pac')?document.getElementById('f-tipo-pac').value||null:null,
     fecha_llegada:document.getElementById('f-llegada').value||null,
     fecha_salida:document.getElementById('f-salida').value||null,
     advocate:document.getElementById('f-advocate').value||null,
